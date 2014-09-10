@@ -1,0 +1,14 @@
+c:\documents and settings\fernando\mis documentos\visual studio 2010\Projects\Teleobservacion\Teleobservacion\bin\Debug\Teleobservacion.dll
+c:\documents and settings\fernando\mis documentos\visual studio 2010\Projects\Teleobservacion\Teleobservacion\bin\Debug\Teleobservacion.pdb
+c:\documents and settings\fernando\mis documentos\visual studio 2010\Projects\Teleobservacion\Teleobservacion\bin\Debug\Interop.MapWinGIS.dll
+c:\documents and settings\fernando\mis documentos\visual studio 2010\Projects\Teleobservacion\Teleobservacion\bin\Debug\AxInterop.MapWinGIS.dll
+c:\documents and settings\fernando\mis documentos\visual studio 2010\Projects\Teleobservacion\Teleobservacion\obj\Debug\ResolveAssemblyReference.cache
+c:\documents and settings\fernando\mis documentos\visual studio 2010\Projects\Teleobservacion\Teleobservacion\obj\Debug\Interop.MapWinGIS.dll
+c:\documents and settings\fernando\mis documentos\visual studio 2010\Projects\Teleobservacion\Teleobservacion\obj\Debug\AxInterop.MapWinGIS.dll
+c:\documents and settings\fernando\mis documentos\visual studio 2010\Projects\Teleobservacion\Teleobservacion\obj\Debug\Teleobservacion.csproj.ResolveComReference.cache
+c:\documents and settings\fernando\mis documentos\visual studio 2010\Projects\Teleobservacion\Teleobservacion\obj\Debug\Teleobservacion.FrmConsulta.resources
+c:\documents and settings\fernando\mis documentos\visual studio 2010\Projects\Teleobservacion\Teleobservacion\obj\Debug\GenerateResource.read.1.tlog
+c:\documents and settings\fernando\mis documentos\visual studio 2010\Projects\Teleobservacion\Teleobservacion\obj\Debug\GenerateResource.write.1.tlog
+c:\documents and settings\fernando\mis documentos\visual studio 2010\Projects\Teleobservacion\Teleobservacion\obj\Debug\Teleobservacion.dll
+c:\documents and settings\fernando\mis documentos\visual studio 2010\Projects\Teleobservacion\Teleobservacion\obj\Debug\Teleobservacion.pdb
+c:\documents and settings\fernando\mis documentos\visual studio 2010\Projects\Teleobservacion\Teleobservacion\bin\Debug\Teleobservacion.esriAddIn
