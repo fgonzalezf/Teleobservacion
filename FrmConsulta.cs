@@ -6,6 +6,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using System.IO;
 
 namespace Teleobservacion
 {
@@ -14,19 +15,39 @@ namespace Teleobservacion
         public FrmConsulta()
         {
             InitializeComponent();
+            map1.AddLayer(@"C:\Documents and Settings\Fernando\Mis documentos\Visual Studio 2010\Projects\Teleobservacion\Shapes_Magna\Planchas_100K.shp");
+            map1.AddLayer(@"C:\Documents and Settings\Fernando\Mis documentos\Visual Studio 2010\Projects\Teleobservacion\Shapes_Magna\Municipios.shp");
+            
         }
 
-        private void btnAgregar_Click(object sender, EventArgs e)
+        
+       
+
+        private void btnAlejar_Click(object sender, EventArgs e)
         {
-            AddLayerWM agregar = new AddLayerWM();
-            axMap1.Projection = MapWinGIS.tkMapProjection.PROJECTION_GOOGLE_MERCATOR;
-            axMap1.KnownExtents = MapWinGIS.tkKnownExtents.keColombia;
-            agregar.AddLayers(axMap1,"C:/Documents and Settings/Fernando/Mis documentos/Visual Studio 2010/Projects/Teleobservacion/Shapes_Magna");
+            map1.ZoomOut();
         }
 
-        private void btnCerrar_Click(object sender, EventArgs e)
+        private void btnFullExtent_Click(object sender, EventArgs e)
         {
-            this.Close();
+            map1.ZoomToMaxExtent();
         }
+
+        private void btnPaneo_Click(object sender, EventArgs e)
+        {
+            map1.FunctionMode = DotSpatial.Controls.FunctionMode.Pan;
+        }
+
+        private void btnAcercar_Click(object sender, EventArgs e)
+        {
+            map1.ZoomIn();
+            
+        }
+
+        private void btnBuscar_Click(object sender, EventArgs e)
+        {
+
+        }
+        
     }
 }

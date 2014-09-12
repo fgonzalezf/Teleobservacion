@@ -53,17 +53,37 @@
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="DotSpatial.Controls">
+      <HintPath>..\..\..\..\DotSpatial\DotSpatial.Controls.dll</HintPath>
+    </Reference>
+    <Reference Include="DotSpatial.Data">
+      <HintPath>..\..\..\..\DotSpatial\DotSpatial.Data.dll</HintPath>
+    </Reference>
+    <Reference Include="DotSpatial.Symbology">
+      <HintPath>..\..\..\..\DotSpatial\DotSpatial.Symbology.dll</HintPath>
+    </Reference>
+    <Reference Include="ESRI.ArcGIS.ADF.Connection.Local, Version=10.2.0.0, Culture=neutral, PublicKeyToken=8fc3cc631e44ad86, processorArchitecture=x86" />
+    <Reference Include="ESRI.ArcGIS.DataSourcesGDB, Version=10.2.0.0, Culture=neutral, PublicKeyToken=8fc3cc631e44ad86, processorArchitecture=MSIL">
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </Reference>
     <Reference Include="ESRI.ArcGIS.Desktop.AddIns">
       <Private>False</Private>
     </Reference>
     <Reference Include="ESRI.ArcGIS.Framework">
       <Private>False</Private>
     </Reference>
+    <Reference Include="ESRI.ArcGIS.Geodatabase, Version=10.2.0.0, Culture=neutral, PublicKeyToken=8fc3cc631e44ad86, processorArchitecture=MSIL">
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </Reference>
+    <Reference Include="ESRI.ArcGIS.Geoprocessing, Version=10.2.0.0, Culture=neutral, PublicKeyToken=8fc3cc631e44ad86, processorArchitecture=MSIL">
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </Reference>
     <Reference Include="ESRI.ArcGIS.System">
       <Private>False</Private>
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Reference Include="Microsoft.Build.Framework" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Data" />
@@ -87,11 +107,18 @@
       <DependentUpon>FrmConsulta.cs</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="QueryTable.cs" />
   </ItemGroup>
   <ItemGroup>
     <AddInContent Include="Config.esriaddinx">
       <Generator>ArcGISAddInHostGenerator</Generator>
       <LastGenOutput>Config.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
     </AddInContent>
   </ItemGroup>
   <ItemGroup>
@@ -129,11 +156,6 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="FrmConsulta.resx">
-      <DependentUpon>FrmConsulta.cs</DependentUpon>
-    </EmbeddedResource>
-  </ItemGroup>
-  <ItemGroup>
     <COMReference Include="AxMapWinGIS">
       <Guid>{C368D713-CC5F-40ED-9F53-F84FE197B96A}</Guid>
       <VersionMajor>4</VersionMajor>
@@ -158,8 +180,90 @@
       <Lcid>0</Lcid>
       <WrapperTool>primary</WrapperTool>
       <Isolated>False</Isolated>
-      <EmbedInteropTypes>True</EmbedInteropTypes>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+      <Private>True</Private>
     </COMReference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="FrmConsulta.resx">
+      <DependentUpon>FrmConsulta.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Shapes\Departamentos.shp.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Shapes\Municipios.shp.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Shapes\Planchas_100K.shp.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Images\i_pan.png" />
+    <Content Include="Images\i_zoomfull.png" />
+    <Content Include="Images\i_zoomin.png" />
+    <Content Include="Images\i_zoomout.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Shapes\Departamentos.dbf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Shapes\Departamentos.prj">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Shapes\Departamentos.sbn">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Shapes\Departamentos.sbx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Shapes\Departamentos.shp">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Shapes\Departamentos.shx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Shapes\Municipios.dbf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Shapes\Municipios.prj">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Shapes\Municipios.sbn">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Shapes\Municipios.sbx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Shapes\Municipios.shp">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Shapes\Municipios.shx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Shapes\Planchas_100K.dbf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Shapes\Planchas_100K.prj">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Shapes\Planchas_100K.sbn">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Shapes\Planchas_100K.sbx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Shapes\Planchas_100K.shp">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Shapes\Planchas_100K.shx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
   </ItemGroup>
   <PropertyGroup>
     <ZipFileExtension>esriAddIn</ZipFileExtension>
