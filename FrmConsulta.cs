@@ -28,12 +28,18 @@ namespace Teleobservacion
             map1.AddLayer(@"C:\Documents and Settings\Fernando\Mis documentos\Visual Studio 2010\Projects\Shapes\Departamentos.shp");
             map1.AddLayer(@"C:\Documents and Settings\Fernando\Mis documentos\Visual Studio 2010\Projects\Shapes\Municipios.shp");
             map1.AddLayer(@"C:\Documents and Settings\Fernando\Mis documentos\Visual Studio 2010\Projects\Shapes\Planchas_100K.shp");
+
             map1.Layers[0].UseDynamicVisibility = true;
-            map1.Layers[0].DynamicVisibilityWidth = 1;
-            map1.Layers[0].DynamicVisibilityMode = DynamicVisibilityMode.ZoomedOut;
+            map1.Layers[0].DynamicVisibilityWidth = 25;
+            map1.Layers[0].DynamicVisibilityMode = DynamicVisibilityMode.ZoomedIn;
             map1.Layers[1].UseDynamicVisibility = true;
-            map1.Layers[1].DynamicVisibilityWidth = 1;
-            map1.Layers[1].DynamicVisibilityMode = DynamicVisibilityMode.ZoomedOut;
+            map1.Layers[1].DynamicVisibilityWidth = 8;
+            map1.Layers[1].DynamicVisibilityMode = DynamicVisibilityMode.ZoomedIn;
+            map1.Layers[2].UseDynamicVisibility = true;
+            map1.Layers[2].DynamicVisibilityWidth = 2;
+            map1.Layers[2].DynamicVisibilityMode = DynamicVisibilityMode.ZoomedIn;
+
+            map1.Refresh();
             
             
             
