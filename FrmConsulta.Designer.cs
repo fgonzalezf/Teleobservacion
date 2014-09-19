@@ -89,6 +89,9 @@
             this.map1.SelectionEnabled = true;
             this.map1.Size = new System.Drawing.Size(326, 292);
             this.map1.TabIndex = 0;
+            this.map1.Load += new System.EventHandler(this.map1_Load);
+            this.map1.GeoMouseMove += new System.EventHandler<DotSpatial.Controls.GeoMouseArgs>(map1_GeoMouseMove);
+           
             // 
             // btnAcercar
             // 
