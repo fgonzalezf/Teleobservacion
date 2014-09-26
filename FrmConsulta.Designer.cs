@@ -36,6 +36,7 @@
             this.btnFullExtent = new System.Windows.Forms.Button();
             this.btnAlejar = new System.Windows.Forms.Button();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.dateTimeFecha = new System.Windows.Forms.DateTimePicker();
             this.btnLimpiarBusqueda = new System.Windows.Forms.Button();
             this.label10 = new System.Windows.Forms.Label();
             this.label9 = new System.Windows.Forms.Label();
@@ -47,11 +48,6 @@
             this.label3 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
-            this.cbxFecha = new System.Windows.Forms.ComboBox();
-            this.txtLongitudMax = new System.Windows.Forms.TextBox();
-            this.txtLongitudMin = new System.Windows.Forms.TextBox();
-            this.txtLatitudMax = new System.Windows.Forms.TextBox();
-            this.txtLatitudMin = new System.Windows.Forms.TextBox();
             this.txtNombre = new System.Windows.Forms.TextBox();
             this.cbxMunicipio = new System.Windows.Forms.ComboBox();
             this.cbxDepartamento = new System.Windows.Forms.ComboBox();
@@ -60,7 +56,12 @@
             this.groupBox3 = new System.Windows.Forms.GroupBox();
             this.dataGridViewResultados = new System.Windows.Forms.DataGridView();
             this.groupBox4 = new System.Windows.Forms.GroupBox();
+            this.btnDescargar = new System.Windows.Forms.Button();
             this.picMuestraGrafica = new System.Windows.Forms.PictureBox();
+            this.txtLatitudMin = new TextBoxConFormato.FormattedTextBox();
+            this.txtLatitudMax = new TextBoxConFormato.FormattedTextBox();
+            this.txtLongitudMin = new TextBoxConFormato.FormattedTextBox();
+            this.txtLongitudMax = new TextBoxConFormato.FormattedTextBox();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox3.SuspendLayout();
@@ -89,9 +90,8 @@
             this.map1.SelectionEnabled = true;
             this.map1.Size = new System.Drawing.Size(326, 292);
             this.map1.TabIndex = 0;
+            this.map1.GeoMouseMove += new System.EventHandler<DotSpatial.Controls.GeoMouseArgs>(this.map1_GeoMouseMove);
             this.map1.Load += new System.EventHandler(this.map1_Load);
-            this.map1.GeoMouseMove += new System.EventHandler<DotSpatial.Controls.GeoMouseArgs>(map1_GeoMouseMove);
-           
             // 
             // btnAcercar
             // 
@@ -160,6 +160,11 @@
             // 
             // groupBox2
             // 
+            this.groupBox2.Controls.Add(this.txtLongitudMax);
+            this.groupBox2.Controls.Add(this.txtLongitudMin);
+            this.groupBox2.Controls.Add(this.txtLatitudMax);
+            this.groupBox2.Controls.Add(this.txtLatitudMin);
+            this.groupBox2.Controls.Add(this.dateTimeFecha);
             this.groupBox2.Controls.Add(this.btnLimpiarBusqueda);
             this.groupBox2.Controls.Add(this.label10);
             this.groupBox2.Controls.Add(this.label9);
@@ -171,11 +176,6 @@
             this.groupBox2.Controls.Add(this.label3);
             this.groupBox2.Controls.Add(this.label2);
             this.groupBox2.Controls.Add(this.label1);
-            this.groupBox2.Controls.Add(this.cbxFecha);
-            this.groupBox2.Controls.Add(this.txtLongitudMax);
-            this.groupBox2.Controls.Add(this.txtLongitudMin);
-            this.groupBox2.Controls.Add(this.txtLatitudMax);
-            this.groupBox2.Controls.Add(this.txtLatitudMin);
             this.groupBox2.Controls.Add(this.txtNombre);
             this.groupBox2.Controls.Add(this.cbxMunicipio);
             this.groupBox2.Controls.Add(this.cbxDepartamento);
@@ -188,6 +188,16 @@
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Buscar por atributo";
             // 
+            // dateTimeFecha
+            // 
+            this.dateTimeFecha.Location = new System.Drawing.Point(130, 225);
+            this.dateTimeFecha.MaxDate = new System.DateTime(2100, 12, 31, 0, 0, 0, 0);
+            this.dateTimeFecha.MinDate = new System.DateTime(1900, 1, 1, 0, 0, 0, 0);
+            this.dateTimeFecha.Name = "dateTimeFecha";
+            this.dateTimeFecha.Size = new System.Drawing.Size(200, 20);
+            this.dateTimeFecha.TabIndex = 21;
+            this.dateTimeFecha.Value = new System.DateTime(2014, 9, 24, 0, 0, 0, 0);
+            // 
             // btnLimpiarBusqueda
             // 
             this.btnLimpiarBusqueda.Location = new System.Drawing.Point(346, 337);
@@ -196,6 +206,7 @@
             this.btnLimpiarBusqueda.TabIndex = 20;
             this.btnLimpiarBusqueda.Text = "Limpiar Campos";
             this.btnLimpiarBusqueda.UseVisualStyleBackColor = true;
+            this.btnLimpiarBusqueda.Click += new System.EventHandler(this.btnLimpiarBusqueda_Click);
             // 
             // label10
             // 
@@ -287,42 +298,6 @@
             this.label1.TabIndex = 10;
             this.label1.Text = "Tipo:";
             // 
-            // cbxFecha
-            // 
-            this.cbxFecha.FormattingEnabled = true;
-            this.cbxFecha.Location = new System.Drawing.Point(130, 229);
-            this.cbxFecha.Name = "cbxFecha";
-            this.cbxFecha.Size = new System.Drawing.Size(215, 21);
-            this.cbxFecha.TabIndex = 9;
-            // 
-            // txtLongitudMax
-            // 
-            this.txtLongitudMax.Location = new System.Drawing.Point(307, 190);
-            this.txtLongitudMax.Name = "txtLongitudMax";
-            this.txtLongitudMax.Size = new System.Drawing.Size(138, 20);
-            this.txtLongitudMax.TabIndex = 8;
-            // 
-            // txtLongitudMin
-            // 
-            this.txtLongitudMin.Location = new System.Drawing.Point(130, 190);
-            this.txtLongitudMin.Name = "txtLongitudMin";
-            this.txtLongitudMin.Size = new System.Drawing.Size(138, 20);
-            this.txtLongitudMin.TabIndex = 7;
-            // 
-            // txtLatitudMax
-            // 
-            this.txtLatitudMax.Location = new System.Drawing.Point(307, 164);
-            this.txtLatitudMax.Name = "txtLatitudMax";
-            this.txtLatitudMax.Size = new System.Drawing.Size(138, 20);
-            this.txtLatitudMax.TabIndex = 6;
-            // 
-            // txtLatitudMin
-            // 
-            this.txtLatitudMin.Location = new System.Drawing.Point(130, 164);
-            this.txtLatitudMin.Name = "txtLatitudMin";
-            this.txtLatitudMin.Size = new System.Drawing.Size(138, 20);
-            this.txtLatitudMin.TabIndex = 5;
-            // 
             // txtNombre
             // 
             this.txtNombre.Location = new System.Drawing.Point(130, 57);
@@ -337,6 +312,7 @@
             this.cbxMunicipio.Name = "cbxMunicipio";
             this.cbxMunicipio.Size = new System.Drawing.Size(315, 21);
             this.cbxMunicipio.TabIndex = 3;
+            this.cbxMunicipio.SelectedIndexChanged += new System.EventHandler(this.cbxMunicipio_SelectedIndexChanged);
             // 
             // cbxDepartamento
             // 
@@ -345,6 +321,7 @@
             this.cbxDepartamento.Name = "cbxDepartamento";
             this.cbxDepartamento.Size = new System.Drawing.Size(315, 21);
             this.cbxDepartamento.TabIndex = 2;
+            this.cbxDepartamento.SelectedIndexChanged += new System.EventHandler(this.cbxDepartamento_SelectedIndexChanged);
             // 
             // cbxPlanchas
             // 
@@ -353,6 +330,7 @@
             this.cbxPlanchas.Name = "cbxPlanchas";
             this.cbxPlanchas.Size = new System.Drawing.Size(315, 21);
             this.cbxPlanchas.TabIndex = 1;
+            this.cbxPlanchas.SelectedIndexChanged += new System.EventHandler(this.cbxPlanchas_SelectedIndexChanged);
             // 
             // cbxTipo
             // 
@@ -382,6 +360,7 @@
             // 
             // groupBox4
             // 
+            this.groupBox4.Controls.Add(this.btnDescargar);
             this.groupBox4.Controls.Add(this.picMuestraGrafica);
             this.groupBox4.Location = new System.Drawing.Point(518, 379);
             this.groupBox4.Name = "groupBox4";
@@ -390,13 +369,66 @@
             this.groupBox4.TabStop = false;
             this.groupBox4.Text = "Muestra Gráfica";
             // 
+            // btnDescargar
+            // 
+            this.btnDescargar.Location = new System.Drawing.Point(111, 195);
+            this.btnDescargar.Name = "btnDescargar";
+            this.btnDescargar.Size = new System.Drawing.Size(75, 23);
+            this.btnDescargar.TabIndex = 1;
+            this.btnDescargar.Text = "Descargar";
+            this.btnDescargar.UseVisualStyleBackColor = true;
+            // 
             // picMuestraGrafica
             // 
             this.picMuestraGrafica.Location = new System.Drawing.Point(7, 19);
             this.picMuestraGrafica.Name = "picMuestraGrafica";
-            this.picMuestraGrafica.Size = new System.Drawing.Size(293, 194);
+            this.picMuestraGrafica.Size = new System.Drawing.Size(293, 172);
             this.picMuestraGrafica.TabIndex = 0;
             this.picMuestraGrafica.TabStop = false;
+            // 
+            // txtLatitudMin
+            // 
+            this.txtLatitudMin.Decimals = ((byte)(0));
+            this.txtLatitudMin.DecSeparator = '.';
+            this.txtLatitudMin.Format = TextBoxConFormato.tbFormats.SignedFixedPointNumber;
+            this.txtLatitudMin.Location = new System.Drawing.Point(130, 164);
+            this.txtLatitudMin.Name = "txtLatitudMin";
+            this.txtLatitudMin.Size = new System.Drawing.Size(138, 20);
+            this.txtLatitudMin.TabIndex = 22;
+            this.txtLatitudMin.UserValues = "";
+            // 
+            // txtLatitudMax
+            // 
+            this.txtLatitudMax.Decimals = ((byte)(0));
+            this.txtLatitudMax.DecSeparator = '.';
+            this.txtLatitudMax.Format = TextBoxConFormato.tbFormats.SignedFixedPointNumber;
+            this.txtLatitudMax.Location = new System.Drawing.Point(307, 164);
+            this.txtLatitudMax.Name = "txtLatitudMax";
+            this.txtLatitudMax.Size = new System.Drawing.Size(138, 20);
+            this.txtLatitudMax.TabIndex = 23;
+            this.txtLatitudMax.UserValues = "";
+            // 
+            // txtLongitudMin
+            // 
+            this.txtLongitudMin.Decimals = ((byte)(0));
+            this.txtLongitudMin.DecSeparator = '.';
+            this.txtLongitudMin.Format = TextBoxConFormato.tbFormats.SignedFixedPointNumber;
+            this.txtLongitudMin.Location = new System.Drawing.Point(130, 190);
+            this.txtLongitudMin.Name = "txtLongitudMin";
+            this.txtLongitudMin.Size = new System.Drawing.Size(138, 20);
+            this.txtLongitudMin.TabIndex = 24;
+            this.txtLongitudMin.UserValues = "";
+            // 
+            // txtLongitudMax
+            // 
+            this.txtLongitudMax.Decimals = ((byte)(0));
+            this.txtLongitudMax.DecSeparator = '.';
+            this.txtLongitudMax.Format = TextBoxConFormato.tbFormats.SignedFixedPointNumber;
+            this.txtLongitudMax.Location = new System.Drawing.Point(307, 193);
+            this.txtLongitudMax.Name = "txtLongitudMax";
+            this.txtLongitudMax.Size = new System.Drawing.Size(138, 20);
+            this.txtLongitudMax.TabIndex = 25;
+            this.txtLongitudMax.UserValues = "";
             // 
             // FrmConsulta
             // 
@@ -444,16 +476,17 @@
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.ComboBox cbxFecha;
-        private System.Windows.Forms.TextBox txtLongitudMax;
-        private System.Windows.Forms.TextBox txtLongitudMin;
-        private System.Windows.Forms.TextBox txtLatitudMax;
-        private System.Windows.Forms.TextBox txtLatitudMin;
         private System.Windows.Forms.TextBox txtNombre;
         private System.Windows.Forms.ComboBox cbxMunicipio;
         private System.Windows.Forms.ComboBox cbxDepartamento;
         private System.Windows.Forms.ComboBox cbxPlanchas;
         private System.Windows.Forms.ComboBox cbxTipo;
         private System.Windows.Forms.PictureBox picMuestraGrafica;
+        private System.Windows.Forms.Button btnDescargar;
+        private System.Windows.Forms.DateTimePicker dateTimeFecha;
+        private TextBoxConFormato.FormattedTextBox txtLongitudMax;
+        private TextBoxConFormato.FormattedTextBox txtLongitudMin;
+        private TextBoxConFormato.FormattedTextBox txtLatitudMax;
+        private TextBoxConFormato.FormattedTextBox txtLatitudMin;
     }
 }

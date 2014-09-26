@@ -22,14 +22,42 @@ namespace Teleobservacion
                
                 ICursor pCursor = table.Search(queryFilter, true);
                 IRow pRow = pCursor.NextRow();
-
-                if (pRow != null)
+                DataColumn column;
+                IFields pFields = table.Fields;
+                for (int i = 0; i < pCursor.Fields.FieldCount; i++)
                 {
-                    for (int i = 0; i < pRow.Fields.FieldCount; i++)
+                    column = new DataColumn();
+                    column.ColumnName = pFields.get_Field(i).Name;
+                    if (pFields.get_Field(i).Type == esriFieldType.esriFieldTypeString)
                     {
-                        ExpertInfo.Columns.Add(pRow.Fields.get_Field(i).Name);
+                        column.DataType = System.Type.GetType("System.String");
                     }
-                    while (pRow != null)
+                    else if (pFields.get_Field(i).Type == esriFieldType.esriFieldTypeInteger)
+                    {
+                        column.DataType = System.Type.GetType("System.Int32");
+                    }
+                    else if (pFields.get_Field(i).Type == esriFieldType.esriFieldTypeDouble)
+                    {
+                        column.DataType = System.Type.GetType("System.Double");
+                    }
+                    else if (pFields.get_Field(i).Type == esriFieldType.esriFieldTypeDate)
+                    {
+                        column.DataType = System.Type.GetType("System.DateTime");
+                    }
+                    else if (pFields.get_Field(i).Type == esriFieldType.esriFieldTypeSingle)
+                    {
+                        column.DataType = System.Type.GetType("System.Single");
+                    }
+                    else if (pFields.get_Field(i).Type == esriFieldType.esriFieldTypeBlob)
+                    {
+                        column.DataType = System.Type.GetType("System.Byte");
+                    }
+                    column.ReadOnly = false;
+                    ExpertInfo.Columns.Add(column);
+                }
+                
+                    
+                while (pRow != null)
                     {
                         DataRow pDataRow = ExpertInfo.NewRow();
                         for (int j = 0; j < pCursor.Fields.FieldCount; j++)
@@ -37,7 +65,7 @@ namespace Teleobservacion
                         ExpertInfo.Rows.Add(pDataRow);
                         pRow = pCursor.NextRow();
                     }
-                }
+                
             }
             catch (System.Exception ex)
             {
