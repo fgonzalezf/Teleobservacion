@@ -15,6 +15,8 @@ using DotSpatial.Symbology;
 using DotSpatial.Topology;
 using DotSpatial.Projections;
 using System.Reflection;
+using System.Threading;
+using System.Net;
 namespace Teleobservacion
 {
     public partial class FrmConsulta : Form
@@ -101,10 +103,13 @@ namespace Teleobservacion
         private void llenarComboBox()
         {
             cbxTipo.Items.Add("");
-            cbxTipo.Items.Add("SPOT");
-            cbxTipo.Items.Add("LANDSAT");
             cbxTipo.Items.Add("RADAR");
-            cbxTipo.Items.Add("FOTOGRAFIA AEREA");
+            cbxTipo.Items.Add("LANDSAT TM");
+            cbxTipo.Items.Add("LANDSAT ETM");
+            cbxTipo.Items.Add("SPOT");
+            cbxTipo.Items.Add("IKONOS");
+            cbxTipo.Items.Add("ORTOFOTO");
+            cbxTipo.Items.Add("ASTER");
 
             LlenarCombobox llenar = new LlenarCombobox();
             cbxDepartamento.DataSource = llenar.listaElementos(AssemblyDirectory + "/Shapes/Departamentos.shp", "NOMBRE", "");
@@ -137,12 +142,14 @@ namespace Teleobservacion
         {
             IGPUtilities pGputilities = new GPUtilitiesClass();
             ITable pTable = pGputilities.OpenTableFromString(@"E:\SICAT\TELEOBSERVACION\TeleObservacion.mdb\F03IMG_IMGN_100K");
+
+            string Query = ConsutaExtent(txtLongitudMax.Text, txtLongitudMin.Text,txtLatitudMin.Text, txtLatitudMax.Text);
             Table_To_DataTable pDataTable = new Table_To_DataTable();
-            DataTable Tabla = pDataTable.ConvertITable(pTable, "");
+            DataTable Tabla = pDataTable.ConvertITable(pTable, Query);
             dataGridViewResultados.DataSource = Tabla;
             dataGridViewResultados.Update();
 
-            MessageBox.Show("X MAX: " + map1.ViewExtents.MaxX.ToString() + "   " + "X MIN: " + map1.ViewExtents.MinX.ToString() + "   " + "Y MAX: " + map1.ViewExtents.MaxY.ToString() + "   " + "Y MIN: " + map1.ViewExtents.MinY.ToString());
+           
 
         }
 
@@ -198,8 +205,211 @@ namespace Teleobservacion
 
         }
 
+        private void dataGridViewResultados_SelectionChanged(object sender, EventArgs e)
+        {
+            foreach (DataGridViewRow row in dataGridViewResultados.SelectedRows)
+            {
+                string filaSeleccionada = row.Cells[20].Value.ToString();
+                picMuestraGrafica.Image = Image.FromFile(@"\\172.25.1.204\siger\imagenes\" + filaSeleccionada);
+                picMuestraGrafica.Refresh();
+                
+            }
+        }
 
-        //               \\172.25.1.204\siger\imagenes
+        private void map1_GeoMouseMove(object sender, GeoMouseArgs e)
+        {
+
+        }
+
+        private void picMuestraGrafica_MouseDoubleClick(object sender, MouseEventArgs e)
+        {
+            FrmAmpliacion ampliarImagen = new FrmAmpliacion();
+            ampliarImagen.CargarImagen(picMuestraGrafica.Image);
+            ampliarImagen.Text = dataGridViewResultados.SelectedRows[0].Cells[20].Value.ToString();
+            ampliarImagen.Show();
+            ampliarImagen.Refresh();
+        }
+
+        private void btnDescargar_Click(object sender, EventArgs e)
+        {
+            Thread proceso = new Thread(new ThreadStart(copiaImagen));
+            proceso.Start();
+            
+            
+
+        }
+
+        public void copiaImagen()
+        {
+            string fileToCopy = @"\\172.25.1.204\siger\imagenes\" + dataGridViewResultados.SelectedRows[0].Cells[12].Value.ToString(); // or whatever 
+            lblProceso.Text = "Descargando...";
+            btnDescargar.Enabled = false;
+            SaveFileDialog sfd = new SaveFileDialog();
+
+            sfd.FileName = fileToCopy;
+
+            sfd.Filter = "Jpeg Imagen|*.jpg|Bitmap Imagen|*.bmp|Tif Imagen|*.tif";
+
+            sfd.FilterIndex = 1;
+
+
+            if (sfd.ShowDialog() == DialogResult.OK)
+            {
+
+                System.IO.File.Copy(fileToCopy, sfd.FileName, true);
+
+
+            }
+            lblProceso.Text = "Descarga Terminada";
+            btnDescargar.Enabled = true;
+        }
+
+        public void TestConnectivity_Using_Credentials()
+        {
+            try
+            {
+                NetworkCredential readCredentials = new System.Net.NetworkCredential(@"Domain\UserName", "Password");
+
+                string filepath = @"\\Servername\DevTest\MyFiles";
+                using (new NetworkConnection(filepath, readCredentials))
+                {
+                    //File.Copy(@"\\Servername\DevTest\MyFiles\XXX.txt\\Servername\DevTest\MyFiles\XXX-Copy.txt");
+                }
+                
+            }
+            catch
+            {
+                
+            }
+        }
+
+        private void cbxTipo_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (cbxTipo.Text == "RADAR")
+            {
+                if (groupBox2.Controls["txbPath"] != null)
+                {
+                    groupBox2.Controls.Remove(groupBox2.Controls["lblpath"]);
+                    groupBox2.Controls.Remove(groupBox2.Controls["txbPath"]);
+                    groupBox2.Controls.Remove(groupBox2.Controls["txbRow"]);
+                    groupBox2.Controls.Remove(groupBox2.Controls["lblrow"]);
+                }
+                ComboBox cbxTipoRadar = new ComboBox();
+                cbxTipoRadar.Location = new System.Drawing.Point(130, 260);
+                cbxTipoRadar.Name = "cbxTipoRadar";
+                cbxTipoRadar.Size = new System.Drawing.Size(315, 21);
+                cbxTipoRadar.Items.Add("Radarsat1");
+                cbxTipoRadar.Items.Add("Radarsat2");
+
+                Label lblTipoRadar = new Label();
+                lblTipoRadar.Name = "lblTipoRadar";
+                lblTipoRadar.Location = new System.Drawing.Point(22, 260);
+                lblTipoRadar.Text = "Tipo Radar ";
+                
+
+                TextBox txbIdentificador = new TextBox();
+                txbIdentificador.Location = new System.Drawing.Point(130, 295);
+                txbIdentificador.Name = "txbIdentificador";
+                txbIdentificador.Size = new System.Drawing.Size(315, 21);
+
+
+                Label lblTipoIdentificador = new Label();
+                lblTipoIdentificador.Name = "lblTipoIdentificador";
+                lblTipoIdentificador.Location = new System.Drawing.Point(22, 295);
+                lblTipoIdentificador.Text = "Identificador ";
+
+
+                this.groupBox2.Controls.Add(cbxTipoRadar);
+                this.groupBox2.Controls.Add(lblTipoRadar);
+                this.groupBox2.Controls.Add(txbIdentificador);
+                this.groupBox2.Controls.Add(lblTipoIdentificador);
+
+            }
+            else if (cbxTipo.Text == "LANDSAT TM" || cbxTipo.Text == "LANDSAT ETM")
+            {
+                if (groupBox2.Controls["cbxTipoRadar"] != null)
+                {
+                    groupBox2.Controls.Remove(groupBox2.Controls["lblTipoRadar"]);
+                    groupBox2.Controls.Remove(groupBox2.Controls["cbxTipoRadar"]);
+                    groupBox2.Controls.Remove(groupBox2.Controls["txbIdentificador"]);
+                    groupBox2.Controls.Remove(groupBox2.Controls["lblTipoIdentificador"]);
+                }
+                if (groupBox2.Controls["txbPath"] == null)
+                {
+                    Label lblpath = new Label();
+                    lblpath.Name = "lblpath";
+                    lblpath.Location = new System.Drawing.Point(22, 260);
+                    lblpath.Text = "Path ";
+
+
+                    TextBox txbPath = new TextBox();
+                    txbPath.Location = new System.Drawing.Point(130, 260);
+                    txbPath.Name = "txbPath";
+                    txbPath.Size = new System.Drawing.Size(315, 21);
+
+
+                    Label lblrow = new Label();
+                    lblrow.Name = "lblrow";
+                    lblrow.Location = new System.Drawing.Point(22, 295);
+                    lblrow.Text = "Row ";
+
+                    TextBox txbRow = new TextBox();
+                    txbRow.Location = new System.Drawing.Point(130, 295);
+                    txbRow.Name = "txbRow";
+                    txbRow.Size = new System.Drawing.Size(315, 21);
+
+                    this.groupBox2.Controls.Add(txbRow);
+                    this.groupBox2.Controls.Add(lblpath);
+                    this.groupBox2.Controls.Add(txbPath);
+                    this.groupBox2.Controls.Add(lblrow);
+                }
+            }
+            else
+            {
+                if (groupBox2.Controls["cbxTipoRadar"] != null)
+                {
+                    groupBox2.Controls.Remove(groupBox2.Controls["lblTipoRadar"]);
+                    groupBox2.Controls.Remove(groupBox2.Controls["cbxTipoRadar"]);
+                    groupBox2.Controls.Remove(groupBox2.Controls["txbIdentificador"]);
+                    groupBox2.Controls.Remove(groupBox2.Controls["lblTipoIdentificador"]);
+                }
+                else if (groupBox2.Controls["txbPath"] != null)
+                {
+                    groupBox2.Controls.Remove(groupBox2.Controls["lblpath"]);
+                    groupBox2.Controls.Remove(groupBox2.Controls["txbPath"]);
+                    groupBox2.Controls.Remove(groupBox2.Controls["txbRow"]);
+                    groupBox2.Controls.Remove(groupBox2.Controls["lblrow"]);
+                }
+                
+            }
+
+
+        }
+
+        private void map1_ViewExtentsChanged(object sender, ExtentArgs e)
+        {
+            txtLatitudMax.Text = map1.ViewExtents.MaxY.ToString().Replace(",",".");
+            txtLatitudMin.Text = map1.ViewExtents.MinY.ToString().Replace(",", ".");
+            txtLongitudMax.Text = map1.ViewExtents.MaxX.ToString().Replace(",", ".");
+            txtLongitudMin.Text = map1.ViewExtents.MinX.ToString().Replace(",", ".");        
+
+        }
+       
+
+        private string ConsutaExtent( string xMax, string xMin, string yMin, string yMax)
+        {
+
+            string latitudMinima = "[IMG_LAT_MIN] >=" + yMin;
+            string latitudMaxima = "[IMG_LAT_MAX] <=" + yMax;
+            string longitudMinima = "[IMG_LONG_MIN] >=" + xMin;
+            string longitudMaxima = "[IMG_LONG_MAX] <=" + xMax;
+
+            string consulta = latitudMinima + "AND" + latitudMaxima + "AND" + longitudMinima + "AND" + longitudMaxima;
+            return consulta;
+
+        }
+            
+            
         
         
     }

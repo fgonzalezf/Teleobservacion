@@ -125,6 +125,13 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Config.esriaddinx</DependentUpon>
     </Compile>
+    <Compile Include="CustomFileCopier.cs" />
+    <Compile Include="FrmAmpliacion.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FrmAmpliacion.Designer.cs">
+      <DependentUpon>FrmAmpliacion.cs</DependentUpon>
+    </Compile>
     <Compile Include="FrmConsulta.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -219,6 +226,9 @@
     </COMReference>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="FrmAmpliacion.resx">
+      <DependentUpon>FrmAmpliacion.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="FrmConsulta.resx">
       <DependentUpon>FrmConsulta.cs</DependentUpon>
     </EmbeddedResource>
