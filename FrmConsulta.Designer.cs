@@ -147,9 +147,7 @@
             this.map1.SelectionEnabled = true;
             this.map1.Size = new System.Drawing.Size(326, 292);
             this.map1.TabIndex = 0;
-            this.map1.GeoMouseMove += new System.EventHandler<DotSpatial.Controls.GeoMouseArgs>(this.map1_GeoMouseMove);
             this.map1.ViewExtentsChanged += new System.EventHandler<DotSpatial.Data.ExtentArgs>(this.map1_ViewExtentsChanged);
-            this.map1.Load += new System.EventHandler(this.map1_Load);
             // 
             // btnAcercar
             // 
@@ -245,6 +243,7 @@
             this.dateTimeFecha.Size = new System.Drawing.Size(200, 20);
             this.dateTimeFecha.TabIndex = 21;
             this.dateTimeFecha.Value = new System.DateTime(2014, 9, 24, 0, 0, 0, 0);
+            this.dateTimeFecha.ValueChanged += new System.EventHandler(this.dateTimeFecha_ValueChanged);
             // 
             // btnLimpiarBusqueda
             // 
@@ -458,8 +457,10 @@
             this.Controls.Add(this.groupBox3);
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.groupBox1);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "FrmConsulta";
-            this.Text = "Consulta";
+            this.Text = "Consulta Imagenes Teleinformación";
+            this.Load += new System.EventHandler(this.FrmConsulta_Load);
             this.groupBox1.ResumeLayout(false);
             this.groupBox2.ResumeLayout(false);
             this.groupBox2.PerformLayout();

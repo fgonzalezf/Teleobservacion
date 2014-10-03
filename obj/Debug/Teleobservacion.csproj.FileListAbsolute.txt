@@ -95,4 +95,5 @@ C:\Documents and Settings\Fernando\mis documentos\visual studio 2010\Projects\Te
 C:\Documents and Settings\Fernando\mis documentos\visual studio 2010\Projects\Teleobservacion\Teleobservacion\obj\Debug\GenerateResource.write.1.tlog
 C:\Documents and Settings\Fernando\mis documentos\visual studio 2010\Projects\Teleobservacion\Teleobservacion\obj\Debug\Teleobservacion.dll
 C:\Documents and Settings\Fernando\mis documentos\visual studio 2010\Projects\Teleobservacion\Teleobservacion\obj\Debug\Teleobservacion.pdb
+C:\Documents and Settings\Fernando\mis documentos\visual studio 2010\Projects\Teleobservacion\Teleobservacion\obj\Debug\Teleobservacion.Login.resources
 C:\Documents and Settings\Fernando\mis documentos\visual studio 2010\Projects\Teleobservacion\Teleobservacion\bin\Debug\Teleobservacion.esriAddIn

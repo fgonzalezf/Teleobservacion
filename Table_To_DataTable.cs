@@ -77,5 +77,58 @@ namespace Teleobservacion
 
 
         }
+
+        public void registrarUsuario(ITable pTable, int ID)
+        {
+            try
+            {
+                IRow pRow = pTable.CreateRow();
+                for (int i = 0; i < pRow.Fields.FieldCount; i++)
+                {
+                    if (pRow.Fields.get_Field(i).Name == "ID_IMGN")
+                    {
+                        pRow.set_Value(i, ID);
+                    }
+                    else if (pRow.Fields.get_Field(i).Name == "DES_USUARIO")
+                    {
+                        pRow.set_Value(i, Environment.UserName);
+
+                    }
+                    else if (pRow.Fields.get_Field(i).Name == "DES_FECHA")
+                    {
+                        DateTime fecha = DateTime.Today;
+                        pRow.set_Value(i, fecha);
+                    }
+                    pRow.Store();
+
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error actualizando Base de Datos");
+            }
+            
+
+        }
+
+        public bool autentificacion(ITable pTable, string usuario, string contraseña)
+        {
+                ICursor pCursor = pTable.Search(null, true);
+                IRow pRow = pCursor.NextRow();
+                IFields pFields = pTable.Fields;
+                bool registro= false;
+                while (pRow != null)
+                {
+                    if (pRow.get_Value(1).ToString().ToUpper() == usuario.ToUpper())
+                    {
+                        if (pRow.get_Value(2).ToString() == contraseña)
+                        {
+                            registro = true;
+                        }
+                    }
+                    pRow = pCursor.NextRow();
+                }
+                return registro;
+        }
     }
 }

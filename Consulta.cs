@@ -17,8 +17,8 @@ namespace Teleobservacion
             //  TODO: Sample code showing how to access button host
             //
             ArcMap.Application.CurrentTool = null;
-            FrmConsulta ventana = new FrmConsulta();
-            ventana.Show();
+            Login Atentificacion = new Login();
+            Atentificacion.Show();
         }
         protected override void OnUpdate()
         {

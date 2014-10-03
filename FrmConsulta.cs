@@ -21,11 +21,21 @@ namespace Teleobservacion
 {
     public partial class FrmConsulta : Form
     {
+        ComboBox cbxTipoRadar = null;
+        Label lblTipoRadar = null;
+        TextBox txbIdentificador = null;
+        Label lblTipoIdentificador = null;
+        Label lblpath = null;
+        TextBox txbPath = null;
+        Label lblrow = null;
+        TextBox txbRow = null;
          
         public FrmConsulta()
         {
             InitializeComponent();
-            
+
+            this.dateTimeFecha.Format = DateTimePickerFormat.Custom;
+            this.dateTimeFecha.CustomFormat = " ";
             map1.Projection = KnownCoordinateSystems.Geographic.World.WGS1984;
             map1.AddLayer(AssemblyDirectory + "/Shapes/Departamentos.shp");
             map1.AddLayer(AssemblyDirectory + "/Shapes/Planchas_100K.shp");
@@ -91,13 +101,7 @@ namespace Teleobservacion
 
         private void btnAlejar_Click(object sender, EventArgs e)
         {
-
-            map1.FunctionMode = DotSpatial.Controls.FunctionMode.ZoomOut;
-            
-            
-
-
-
+            map1.FunctionMode = DotSpatial.Controls.FunctionMode.ZoomOut;           
         }
 
         private void llenarComboBox()
@@ -141,9 +145,20 @@ namespace Teleobservacion
         private void btnBuscar_Click(object sender, EventArgs e)
         {
             IGPUtilities pGputilities = new GPUtilitiesClass();
+            string Query;
             ITable pTable = pGputilities.OpenTableFromString(@"E:\SICAT\TELEOBSERVACION\TeleObservacion.mdb\F03IMG_IMGN_100K");
-
-            string Query = ConsutaExtent(txtLongitudMax.Text, txtLongitudMin.Text,txtLatitudMin.Text, txtLatitudMax.Text);
+            if (cbxTipoRadar!= null)
+            {
+                    Query = ConsutaExtent(txtLongitudMax.Text, txtLongitudMin.Text, txtLatitudMin.Text, txtLatitudMax.Text, cbxTipo.Text, txtNombre.Text, dateTimeFecha, groupBox2.Controls["cbxTipoRadar"].Text, groupBox2.Controls["txbIdentificador"].Text,"","");
+            }
+            else if (txbPath != null)
+            {
+                    Query = ConsutaExtent(txtLongitudMax.Text, txtLongitudMin.Text, txtLatitudMin.Text, txtLatitudMax.Text, cbxTipo.Text, txtNombre.Text, dateTimeFecha, "", "", groupBox2.Controls["txbPath"].Text, groupBox2.Controls["txbRow"].Text);
+            }
+            else
+            {
+                    Query = ConsutaExtent(txtLongitudMax.Text, txtLongitudMin.Text, txtLatitudMin.Text, txtLatitudMax.Text, cbxTipo.Text, txtNombre.Text, dateTimeFecha, "", "", "", "");
+            }
             Table_To_DataTable pDataTable = new Table_To_DataTable();
             DataTable Tabla = pDataTable.ConvertITable(pTable, Query);
             dataGridViewResultados.DataSource = Tabla;
@@ -153,13 +168,7 @@ namespace Teleobservacion
 
         }
 
-        private void map1_Load(object sender, EventArgs e)
-        {
-           
-        }
-        private void map1_GeoMouseMove(object sender, EventArgs e)
-        {
-        }
+       
 
         private void cbxDepartamento_SelectedIndexChanged(object sender, EventArgs e)
         {
@@ -184,6 +193,8 @@ namespace Teleobservacion
             txtLongitudMax.Text = "";
             txtLongitudMin.Text = "";
             txtNombre.Text = "";
+            this.dateTimeFecha.Format = DateTimePickerFormat.Custom;
+            this.dateTimeFecha.CustomFormat = " ";
         }
 
         private void cbxMunicipio_SelectedIndexChanged(object sender, EventArgs e)
@@ -209,17 +220,17 @@ namespace Teleobservacion
         {
             foreach (DataGridViewRow row in dataGridViewResultados.SelectedRows)
             {
-                string filaSeleccionada = row.Cells[20].Value.ToString();
-                picMuestraGrafica.Image = Image.FromFile(@"\\172.25.1.204\siger\imagenes\" + filaSeleccionada);
-                picMuestraGrafica.Refresh();
-                
+                NetworkCredential writeCredentials = new NetworkCredential("usr-siger","we3nya$i");
+                using (new NetworkConnection(@"\\172.25.1.204\siger\imagenes\", writeCredentials))
+                {
+                    string filaSeleccionada = row.Cells[20].Value.ToString();
+                    picMuestraGrafica.Image = Image.FromFile(@"\\172.25.1.204\siger\imagenes\" + filaSeleccionada);
+                    picMuestraGrafica.Refresh();
+                }
             }
         }
 
-        private void map1_GeoMouseMove(object sender, GeoMouseArgs e)
-        {
-
-        }
+        
 
         private void picMuestraGrafica_MouseDoubleClick(object sender, MouseEventArgs e)
         {
@@ -233,33 +244,33 @@ namespace Teleobservacion
         private void btnDescargar_Click(object sender, EventArgs e)
         {
             Thread proceso = new Thread(new ThreadStart(copiaImagen));
-            proceso.Start();
-            
-            
+            proceso.Start(); 
 
         }
 
         public void copiaImagen()
         {
-            string fileToCopy = @"\\172.25.1.204\siger\imagenes\" + dataGridViewResultados.SelectedRows[0].Cells[12].Value.ToString(); // or whatever 
-            lblProceso.Text = "Descargando...";
-            btnDescargar.Enabled = false;
-            SaveFileDialog sfd = new SaveFileDialog();
-
-            sfd.FileName = fileToCopy;
-
-            sfd.Filter = "Jpeg Imagen|*.jpg|Bitmap Imagen|*.bmp|Tif Imagen|*.tif";
-
-            sfd.FilterIndex = 1;
-
-
-            if (sfd.ShowDialog() == DialogResult.OK)
+            NetworkCredential writeCredentials = new NetworkCredential("usr-siger","we3nya$i");
+            using (new NetworkConnection(@"\\172.25.1.204\siger\imagenes\", writeCredentials))
             {
 
-                System.IO.File.Copy(fileToCopy, sfd.FileName, true);
-
-
+                string fileToCopy = @"\\172.25.1.204\siger\imagenes\" + dataGridViewResultados.SelectedRows[0].Cells[12].Value.ToString(); // or whatever 
+                lblProceso.Text = "Descargando...";
+                btnDescargar.Enabled = false;
+                SaveFileDialog sfd = new SaveFileDialog();
+                sfd.FileName = fileToCopy;
+                sfd.Filter = "Jpeg Imagen|*.jpg|Bitmap Imagen|*.bmp|Tif Imagen|*.tif";
+                sfd.FilterIndex = 1;
+                if (sfd.ShowDialog() == DialogResult.OK)
+                {
+                    System.IO.File.Copy(fileToCopy, sfd.FileName, true);
+                }
             }
+            IGPUtilities pGputilities = new GPUtilitiesClass();
+            Table_To_DataTable tabla = new Table_To_DataTable();
+            ITable pTable = pGputilities.OpenTableFromString(@"E:\SICAT\TELEOBSERVACION\TeleObservacion.mdb\F03DES_DSCRG");
+            tabla.registrarUsuario(pTable,Convert.ToInt32(dataGridViewResultados.SelectedRows[0].Cells[2].Value));
+
             lblProceso.Text = "Descarga Terminada";
             btnDescargar.Enabled = true;
         }
@@ -285,6 +296,7 @@ namespace Teleobservacion
 
         private void cbxTipo_SelectedIndexChanged(object sender, EventArgs e)
         {
+            
             if (cbxTipo.Text == "RADAR")
             {
                 if (groupBox2.Controls["txbPath"] != null)
@@ -293,36 +305,48 @@ namespace Teleobservacion
                     groupBox2.Controls.Remove(groupBox2.Controls["txbPath"]);
                     groupBox2.Controls.Remove(groupBox2.Controls["txbRow"]);
                     groupBox2.Controls.Remove(groupBox2.Controls["lblrow"]);
+                    
+                    lblpath = null;
+                    txbPath = null;
+                    lblrow = null;
+                    txbRow = null;
                 }
-                ComboBox cbxTipoRadar = new ComboBox();
-                cbxTipoRadar.Location = new System.Drawing.Point(130, 260);
-                cbxTipoRadar.Name = "cbxTipoRadar";
-                cbxTipoRadar.Size = new System.Drawing.Size(315, 21);
-                cbxTipoRadar.Items.Add("Radarsat1");
-                cbxTipoRadar.Items.Add("Radarsat2");
+                if (groupBox2.Controls["cbxTipoRadar"] == null)
+                {
+                    cbxTipoRadar = new ComboBox();
+                    cbxTipoRadar.Location = new System.Drawing.Point(130, 260);
+                    cbxTipoRadar.Name = "cbxTipoRadar";
+                    cbxTipoRadar.Size = new System.Drawing.Size(315, 21);
+                    cbxTipoRadar.Items.Add("");
+                    cbxTipoRadar.Items.Add("Radarsat1");
+                    cbxTipoRadar.Items.Add("Radarsat2");
 
-                Label lblTipoRadar = new Label();
-                lblTipoRadar.Name = "lblTipoRadar";
-                lblTipoRadar.Location = new System.Drawing.Point(22, 260);
-                lblTipoRadar.Text = "Tipo Radar ";
-                
-
-                TextBox txbIdentificador = new TextBox();
-                txbIdentificador.Location = new System.Drawing.Point(130, 295);
-                txbIdentificador.Name = "txbIdentificador";
-                txbIdentificador.Size = new System.Drawing.Size(315, 21);
+                    lblTipoRadar = new Label();
+                    lblTipoRadar.Name = "lblTipoRadar";
+                    lblTipoRadar.Location = new System.Drawing.Point(22, 260);
+                    lblTipoRadar.Text = "Tipo Radar ";
 
 
-                Label lblTipoIdentificador = new Label();
-                lblTipoIdentificador.Name = "lblTipoIdentificador";
-                lblTipoIdentificador.Location = new System.Drawing.Point(22, 295);
-                lblTipoIdentificador.Text = "Identificador ";
+                    txbIdentificador = new TextBox();
+                    txbIdentificador.Location = new System.Drawing.Point(130, 295);
+                    txbIdentificador.Name = "txbIdentificador";
+                    txbIdentificador.Size = new System.Drawing.Size(315, 21);
 
 
-                this.groupBox2.Controls.Add(cbxTipoRadar);
-                this.groupBox2.Controls.Add(lblTipoRadar);
-                this.groupBox2.Controls.Add(txbIdentificador);
-                this.groupBox2.Controls.Add(lblTipoIdentificador);
+                    lblTipoIdentificador = new Label();
+                    lblTipoIdentificador.Name = "lblTipoIdentificador";
+                    lblTipoIdentificador.Location = new System.Drawing.Point(22, 295);
+                    lblTipoIdentificador.Text = "Identificador ";
+
+
+                    this.groupBox2.Controls.Add(cbxTipoRadar);
+                    this.groupBox2.Controls.Add(lblTipoRadar);
+                    this.groupBox2.Controls.Add(txbIdentificador);
+                    this.groupBox2.Controls.Add(lblTipoIdentificador);
+                    ToolTip tip = new ToolTip();
+                    tip.SetToolTip(groupBox2.Controls["cbxTipoRadar"], "Seleccione el Tipo de Radar");
+                    tip.SetToolTip(groupBox2.Controls["txbIdentificador"], "Ingrese el Identificador de la Imagen a Mostrar");
+                }
 
             }
             else if (cbxTipo.Text == "LANDSAT TM" || cbxTipo.Text == "LANDSAT ETM")
@@ -333,27 +357,32 @@ namespace Teleobservacion
                     groupBox2.Controls.Remove(groupBox2.Controls["cbxTipoRadar"]);
                     groupBox2.Controls.Remove(groupBox2.Controls["txbIdentificador"]);
                     groupBox2.Controls.Remove(groupBox2.Controls["lblTipoIdentificador"]);
+                    cbxTipoRadar = null;
+                    lblTipoRadar = null;
+                    txbIdentificador = null;
+                    lblTipoIdentificador = null;
                 }
                 if (groupBox2.Controls["txbPath"] == null)
                 {
-                    Label lblpath = new Label();
+                    
+                    lblpath = new Label();
                     lblpath.Name = "lblpath";
                     lblpath.Location = new System.Drawing.Point(22, 260);
                     lblpath.Text = "Path ";
 
 
-                    TextBox txbPath = new TextBox();
+                    txbPath = new TextBox();
                     txbPath.Location = new System.Drawing.Point(130, 260);
                     txbPath.Name = "txbPath";
                     txbPath.Size = new System.Drawing.Size(315, 21);
 
 
-                    Label lblrow = new Label();
+                    lblrow = new Label();
                     lblrow.Name = "lblrow";
                     lblrow.Location = new System.Drawing.Point(22, 295);
                     lblrow.Text = "Row ";
 
-                    TextBox txbRow = new TextBox();
+                    txbRow = new TextBox();
                     txbRow.Location = new System.Drawing.Point(130, 295);
                     txbRow.Name = "txbRow";
                     txbRow.Size = new System.Drawing.Size(315, 21);
@@ -362,6 +391,9 @@ namespace Teleobservacion
                     this.groupBox2.Controls.Add(lblpath);
                     this.groupBox2.Controls.Add(txbPath);
                     this.groupBox2.Controls.Add(lblrow);
+                    ToolTip tip = new ToolTip();
+                    tip.SetToolTip(groupBox2.Controls["txbPath"], "Ingrese el Path de la Imagen a buscar");
+                    tip.SetToolTip(groupBox2.Controls["txbRow"], "Ingrese el Row de la Imagen a buscar");
                 }
             }
             else
@@ -372,6 +404,8 @@ namespace Teleobservacion
                     groupBox2.Controls.Remove(groupBox2.Controls["cbxTipoRadar"]);
                     groupBox2.Controls.Remove(groupBox2.Controls["txbIdentificador"]);
                     groupBox2.Controls.Remove(groupBox2.Controls["lblTipoIdentificador"]);
+                    txbPath = null;
+                    cbxTipoRadar = null;
                 }
                 else if (groupBox2.Controls["txbPath"] != null)
                 {
@@ -379,6 +413,8 @@ namespace Teleobservacion
                     groupBox2.Controls.Remove(groupBox2.Controls["txbPath"]);
                     groupBox2.Controls.Remove(groupBox2.Controls["txbRow"]);
                     groupBox2.Controls.Remove(groupBox2.Controls["lblrow"]);
+                    txbPath = null;
+                    cbxTipoRadar = null;
                 }
                 
             }
@@ -396,17 +432,95 @@ namespace Teleobservacion
         }
        
 
-        private string ConsutaExtent( string xMax, string xMin, string yMin, string yMax)
+        private string ConsutaExtent( string xMax, string xMin, string yMin, string yMax, string tipo, string nombre, DateTimePicker fecha, string tipoRadar, string identificador, string path, string row)
         {
+            string consulta="";
+            if (nombre != "")
+            {
+                string cnombre = " AND [IMG_NOMBRE] =" + "'" + nombre + "'";
+                consulta = consulta + cnombre;
+            }          
 
-            string latitudMinima = "[IMG_LAT_MIN] >=" + yMin;
-            string latitudMaxima = "[IMG_LAT_MAX] <=" + yMax;
-            string longitudMinima = "[IMG_LONG_MIN] >=" + xMin;
-            string longitudMaxima = "[IMG_LONG_MAX] <=" + xMax;
+            if (fecha.Text != " ")
+            {
 
-            string consulta = latitudMinima + "AND" + latitudMaxima + "AND" + longitudMinima + "AND" + longitudMaxima;
+                string cfecha = " AND [IMG_FECHA] = #"+fecha.Value.ToString().Replace("/","-")+"#";
+                consulta = consulta + cfecha;
+            }
+
+            if (tipo != "")
+            {
+                string ctipo = " AND [IMG_TIPO_IMGN] =" + "'" + tipo + "'";
+                consulta = consulta +ctipo;
+            }
+            //[PST_TIPO_RADAR] = 1
+
+            if (tipoRadar != "")
+            {
+                string ctipoRadar;
+                if (tipoRadar == "Radarsat1")
+                {
+                    ctipoRadar = " AND [PST_TIPO_RADAR] =" + "1";
+                }
+                else
+                {
+                    ctipoRadar = " AND [PST_TIPO_RADAR] =" + "2";
+                }
+
+                consulta = consulta + ctipoRadar;
+            }
+            if (identificador != "")
+            {
+                string cidentificador = " AND [IMG_IDENT] =" + "'" + identificador + "'";
+                consulta = consulta + cidentificador;
+            }
+            if (path != "")
+            {
+                string cpath = " AND [IMG_PATH] =" + "'" + path + "'";
+                consulta = consulta + cpath;
+            }
+            if (row!= "")
+            {
+                string crow = " AND [IMG_ROW] =" + "'" + row + "'";
+                consulta = consulta + crow;
+            }
+            string latitudMinima = "";
+            string latitudMaxima = "";
+            string longitudMinima = "";
+            string longitudMaxima = "";
+            //[IMG_ROW] = '329' AND [IMG_PATH] = '4'
+            if (yMin != "" && yMax != "" && xMin != "" && xMax != "")
+            {
+                latitudMinima = "[IMG_LAT_MIN] >=" + yMin;
+                latitudMaxima = "[IMG_LAT_MAX] <=" + yMax;
+                longitudMinima = "[IMG_LONG_MIN] >=" + xMin;
+                longitudMaxima = "[IMG_LONG_MAX] <=" + xMax;
+                consulta = " AND" + latitudMinima + "AND" + latitudMaxima + "AND" + longitudMinima + "AND" + longitudMaxima + consulta;
+            }
+            if (consulta!="")
+            {
+                consulta = consulta.Remove(0,4);
+            }
             return consulta;
 
+        }
+
+        private void dateTimeFecha_ValueChanged(object sender, EventArgs e)
+        {
+            dateTimeFecha.CustomFormat = "dd/MM/yyyy";
+        }
+
+        private void FrmConsulta_Load(object sender, EventArgs e)
+        {
+            ToolTip tip = new ToolTip();
+            tip.SetToolTip(this.txtLatitudMin, "Latitud Minima en coordenadas Geográficas");
+            tip.SetToolTip(this.txtLatitudMax, "Latitud Maxima en coordenadas Geográficas");
+            tip.SetToolTip(this.txtLongitudMin, "Longitud Minima en coordenadas Geográficas");
+            tip.SetToolTip(this.txtLongitudMax, "Longitud Maxima en coordenadas Geográficas");
+            tip.SetToolTip(this.txtNombre, "Ingrese el nombre de la imagen Exacto");
+            tip.SetToolTip(this.cbxDepartamento, "Seleccione el Departamento a busqueda");
+            tip.SetToolTip(this.cbxMunicipio, "Seleccione el Municipio de busqueda");
+            tip.SetToolTip(this.dateTimeFecha, "Seleccione la fecha exacta a buscar");
         }
             
             
