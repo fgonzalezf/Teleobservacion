@@ -17,10 +17,12 @@ using DotSpatial.Projections;
 using System.Reflection;
 using System.Threading;
 using System.Net;
+using ESRI.ArcGIS.esriSystem;
 namespace Teleobservacion
 {
     public partial class FrmConsulta : Form
     {
+        
         ComboBox cbxTipoRadar = null;
         Label lblTipoRadar = null;
         TextBox txbIdentificador = null;
@@ -29,6 +31,7 @@ namespace Teleobservacion
         TextBox txbPath = null;
         Label lblrow = null;
         TextBox txbRow = null;
+        
          
         public FrmConsulta()
         {
@@ -83,7 +86,8 @@ namespace Teleobservacion
             llenarComboBox();
 
             map1.Refresh();
-                       
+
+            
             
         }
 
@@ -146,7 +150,10 @@ namespace Teleobservacion
         {
             IGPUtilities pGputilities = new GPUtilitiesClass();
             string Query;
-            ITable pTable = pGputilities.OpenTableFromString(@"E:\SICAT\TELEOBSERVACION\TeleObservacion.mdb\F03IMG_IMGN_100K");
+            IWorkspace pWorkspace = WorkgroupArcSdeWorkspaceFromPropertySet();
+            IFeatureWorkspace pFeatureWorkspace = pWorkspace as IFeatureWorkspace;
+            ITable pTable=pFeatureWorkspace.OpenTable("TLOB.F03IMG_IMGN_100K");
+            //ITable pTable = pGputilities.OpenTableFromString(@"E:\SICAT\TELEOBSERVACION\TeleObservacion.mdb\F03IMG_IMGN_100K");
             if (cbxTipoRadar!= null)
             {
                     Query = ConsutaExtent(txtLongitudMax.Text, txtLongitudMin.Text, txtLatitudMin.Text, txtLatitudMax.Text, cbxTipo.Text, txtNombre.Text, dateTimeFecha, groupBox2.Controls["cbxTipoRadar"].Text, groupBox2.Controls["txbIdentificador"].Text,"","");
@@ -240,35 +247,40 @@ namespace Teleobservacion
             ampliarImagen.Show();
             ampliarImagen.Refresh();
         }
-
         private void btnDescargar_Click(object sender, EventArgs e)
         {
-            Thread proceso = new Thread(new ThreadStart(copiaImagen));
-            proceso.Start(); 
+            string fileToCopy = @"\\172.25.1.204\siger\imagenes\" + dataGridViewResultados.SelectedRows[0].Cells[12].Value.ToString(); // or whatever 
+            lblProceso.Text = "Descargando...";
+            btnDescargar.Enabled = false;
+            SaveFileDialog sfd = new SaveFileDialog();
+            sfd.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+            sfd.FileName = dataGridViewResultados.SelectedRows[0].Cells[12].Value.ToString();
+            sfd.Filter = "Jpeg Imagen|*.jpg|Bitmap Imagen|*.bmp|Tif Imagen|*.tif";
+            sfd.FilterIndex = 1;
+            sfd.ShowDialog();
+            Thread threadExport = new Thread(() => copiaImagen(fileToCopy, sfd.FileName))
+            {
+                IsBackground = true,
+                Name = "threadExport",
+                Priority = ThreadPriority.Normal
+            };
+            threadExport.Start();
 
         }
 
-        public void copiaImagen()
+        public void copiaImagen(string fileToCopy, string Filename)
         {
             NetworkCredential writeCredentials = new NetworkCredential("usr-siger","we3nya$i");
             using (new NetworkConnection(@"\\172.25.1.204\siger\imagenes\", writeCredentials))
             {
-
-                string fileToCopy = @"\\172.25.1.204\siger\imagenes\" + dataGridViewResultados.SelectedRows[0].Cells[12].Value.ToString(); // or whatever 
-                lblProceso.Text = "Descargando...";
-                btnDescargar.Enabled = false;
-                SaveFileDialog sfd = new SaveFileDialog();
-                sfd.FileName = fileToCopy;
-                sfd.Filter = "Jpeg Imagen|*.jpg|Bitmap Imagen|*.bmp|Tif Imagen|*.tif";
-                sfd.FilterIndex = 1;
-                if (sfd.ShowDialog() == DialogResult.OK)
-                {
-                    System.IO.File.Copy(fileToCopy, sfd.FileName, true);
-                }
+                           
+                    System.IO.File.Copy(fileToCopy, Filename, true);                            
             }
             IGPUtilities pGputilities = new GPUtilitiesClass();
             Table_To_DataTable tabla = new Table_To_DataTable();
-            ITable pTable = pGputilities.OpenTableFromString(@"E:\SICAT\TELEOBSERVACION\TeleObservacion.mdb\F03DES_DSCRG");
+            IWorkspace pWorkspace = WorkgroupArcSdeWorkspaceFromPropertySet();
+            IFeatureWorkspace pFeatureWorkspace = pWorkspace as IFeatureWorkspace;
+            ITable pTable = pFeatureWorkspace.OpenTable("TLOB.F03DES_DSCRG");
             tabla.registrarUsuario(pTable,Convert.ToInt32(dataGridViewResultados.SelectedRows[0].Cells[2].Value));
 
             lblProceso.Text = "Descarga Terminada";
@@ -437,20 +449,20 @@ namespace Teleobservacion
             string consulta="";
             if (nombre != "")
             {
-                string cnombre = " AND [IMG_NOMBRE] =" + "'" + nombre + "'";
+                string cnombre = " AND IMG_NOMBRE =" + "'" + nombre + "'";
                 consulta = consulta + cnombre;
             }          
 
             if (fecha.Text != " ")
             {
 
-                string cfecha = " AND [IMG_FECHA] = #"+fecha.Value.ToString().Replace("/","-")+"#";
+                string cfecha = " AND IMG_FECHA ="+"TO_DATE('"+fecha.Value.ToString().Replace("/","-")+"','DD-MM-YYYY HH24:MI:SS')";
                 consulta = consulta + cfecha;
             }
 
             if (tipo != "")
             {
-                string ctipo = " AND [IMG_TIPO_IMGN] =" + "'" + tipo + "'";
+                string ctipo = " AND IMG_TIPO_IMGN =" + "'" + tipo + "'";
                 consulta = consulta +ctipo;
             }
             //[PST_TIPO_RADAR] = 1
@@ -460,28 +472,28 @@ namespace Teleobservacion
                 string ctipoRadar;
                 if (tipoRadar == "Radarsat1")
                 {
-                    ctipoRadar = " AND [PST_TIPO_RADAR] =" + "1";
+                    ctipoRadar = " AND PST_TIPO_RADAR =" + "1";
                 }
                 else
                 {
-                    ctipoRadar = " AND [PST_TIPO_RADAR] =" + "2";
+                    ctipoRadar = " AND PST_TIPO_RADAR =" + "2";
                 }
 
                 consulta = consulta + ctipoRadar;
             }
             if (identificador != "")
             {
-                string cidentificador = " AND [IMG_IDENT] =" + "'" + identificador + "'";
+                string cidentificador = " AND IMG_IDENT =" + "'" + identificador + "'";
                 consulta = consulta + cidentificador;
             }
             if (path != "")
             {
-                string cpath = " AND [IMG_PATH] =" + "'" + path + "'";
+                string cpath = " AND IMG_PATH =" + "'" + path + "'";
                 consulta = consulta + cpath;
             }
             if (row!= "")
             {
-                string crow = " AND [IMG_ROW] =" + "'" + row + "'";
+                string crow = " AND IMG_ROW =" + "'" + row + "'";
                 consulta = consulta + crow;
             }
             string latitudMinima = "";
@@ -491,16 +503,17 @@ namespace Teleobservacion
             //[IMG_ROW] = '329' AND [IMG_PATH] = '4'
             if (yMin != "" && yMax != "" && xMin != "" && xMax != "")
             {
-                latitudMinima = "[IMG_LAT_MIN] >=" + yMin;
-                latitudMaxima = "[IMG_LAT_MAX] <=" + yMax;
-                longitudMinima = "[IMG_LONG_MIN] >=" + xMin;
-                longitudMaxima = "[IMG_LONG_MAX] <=" + xMax;
-                consulta = " AND" + latitudMinima + "AND" + latitudMaxima + "AND" + longitudMinima + "AND" + longitudMaxima + consulta;
+                latitudMinima = "IMG_LAT_MIN >=" + yMin;
+                latitudMaxima = "IMG_LAT_MAX <=" + yMax;
+                longitudMinima = "IMG_LONG_MIN >=" + xMin;
+                longitudMaxima = "IMG_LONG_MAX <=" + xMax;
+                consulta = " AND " + latitudMinima + " AND " + latitudMaxima + " AND " + longitudMinima + " AND " + longitudMaxima + consulta;
             }
             if (consulta!="")
             {
                 consulta = consulta.Remove(0,4);
             }
+            //MessageBox.Show(consulta);
             return consulta;
 
         }
@@ -521,6 +534,23 @@ namespace Teleobservacion
             tip.SetToolTip(this.cbxDepartamento, "Seleccione el Departamento a busqueda");
             tip.SetToolTip(this.cbxMunicipio, "Seleccione el Municipio de busqueda");
             tip.SetToolTip(this.dateTimeFecha, "Seleccione la fecha exacta a buscar");
+        }
+
+        public static IWorkspace WorkgroupArcSdeWorkspaceFromPropertySet()
+        {
+            IPropertySet propertySet = new PropertySetClass();
+            propertySet.SetProperty("SERVER", "172.25.3.110");
+            propertySet.SetProperty("INSTANCE", "sde:oracle11g:sigprod_oda");
+            propertySet.SetProperty("USER", "TLOB");
+            propertySet.SetProperty("PASSWORD", "TeleobservacionSGC");
+            propertySet.SetProperty("VERSION", "SDE.DEFAULT");
+            propertySet.SetProperty("AUTHENTICATION_MODE", "DBMS");
+
+            Type factoryType = Type.GetTypeFromProgID(
+                "esriDataSourcesGDB.SdeWorkspaceFactory");
+            IWorkspaceFactory workspaceFactory = (IWorkspaceFactory)Activator.CreateInstance
+                (factoryType);
+            return workspaceFactory.Open(propertySet, 0);
         }
             
             
