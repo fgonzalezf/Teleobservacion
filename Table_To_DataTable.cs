@@ -105,7 +105,7 @@ namespace Teleobservacion
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Error actualizando Base de Datos");
+                MessageBox.Show("Error actualizando Base de Datos  "  + ex.Message);
             }
             
 

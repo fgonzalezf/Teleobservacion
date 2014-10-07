@@ -59,12 +59,20 @@ namespace Teleobservacion
             propertySet.SetProperty("PASSWORD", "TeleobservacionSGC");
             propertySet.SetProperty("VERSION", "SDE.DEFAULT");
             propertySet.SetProperty("AUTHENTICATION_MODE", "DBMS");
+            try
+            {
 
-            Type factoryType = Type.GetTypeFromProgID(
-                "esriDataSourcesGDB.SdeWorkspaceFactory");
-            IWorkspaceFactory workspaceFactory = (IWorkspaceFactory)Activator.CreateInstance
-                (factoryType);
-            return workspaceFactory.Open(propertySet, 0);
+                Type factoryType = Type.GetTypeFromProgID(
+                    "esriDataSourcesGDB.SdeWorkspaceFactory");
+                IWorkspaceFactory workspaceFactory = (IWorkspaceFactory)Activator.CreateInstance
+                    (factoryType);
+                return workspaceFactory.Open(propertySet, 0);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error conectandose a la base de datos" + ex.Message);
+                return null;
+            }
         }
     }
 }

@@ -157,7 +157,6 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
-    <Compile Include="QueryTable.cs" />
     <Compile Include="Table_To_DataTable.cs" />
   </ItemGroup>
   <ItemGroup>

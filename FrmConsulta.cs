@@ -249,62 +249,67 @@ namespace Teleobservacion
         }
         private void btnDescargar_Click(object sender, EventArgs e)
         {
-            string fileToCopy = @"\\172.25.1.204\siger\imagenes\" + dataGridViewResultados.SelectedRows[0].Cells[12].Value.ToString(); // or whatever 
-            lblProceso.Text = "Descargando...";
-            btnDescargar.Enabled = false;
-            SaveFileDialog sfd = new SaveFileDialog();
-            sfd.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-            sfd.FileName = dataGridViewResultados.SelectedRows[0].Cells[12].Value.ToString();
-            sfd.Filter = "Jpeg Imagen|*.jpg|Bitmap Imagen|*.bmp|Tif Imagen|*.tif";
-            sfd.FilterIndex = 1;
-            sfd.ShowDialog();
-            Thread threadExport = new Thread(() => copiaImagen(fileToCopy, sfd.FileName))
+            try
             {
-                IsBackground = true,
-                Name = "threadExport",
-                Priority = ThreadPriority.Normal
-            };
-            threadExport.Start();
+                string fileToCopy = @"\\172.25.1.204\siger\imagenes\" + dataGridViewResultados.SelectedRows[0].Cells[12].Value.ToString(); // or whatever 
+                lblProceso.Text = "Descargando...";
+                btnDescargar.Enabled = false;
+                SaveFileDialog sfd = new SaveFileDialog();
+                sfd.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+                sfd.FileName = dataGridViewResultados.SelectedRows[0].Cells[12].Value.ToString();
+                sfd.Filter = "Jpeg Imagen|*.jpg|Bitmap Imagen|*.bmp|Tif Imagen|*.tif";
+                sfd.FilterIndex = 1;
+                sfd.ShowDialog();
+                Thread threadExport = new Thread(() => copiaImagen(fileToCopy, sfd.FileName))
+                {
+                    IsBackground = true,
+                    Name = "threadExport",
+                    Priority = ThreadPriority.Normal
+                };
+                threadExport.Start();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error en la descarga de la imagen" + ex.Message);
+            }
 
         }
 
         public void copiaImagen(string fileToCopy, string Filename)
         {
-            NetworkCredential writeCredentials = new NetworkCredential("usr-siger","we3nya$i");
-            using (new NetworkConnection(@"\\172.25.1.204\siger\imagenes\", writeCredentials))
-            {
-                           
-                    System.IO.File.Copy(fileToCopy, Filename, true);                            
-            }
-            IGPUtilities pGputilities = new GPUtilitiesClass();
-            Table_To_DataTable tabla = new Table_To_DataTable();
-            IWorkspace pWorkspace = WorkgroupArcSdeWorkspaceFromPropertySet();
-            IFeatureWorkspace pFeatureWorkspace = pWorkspace as IFeatureWorkspace;
-            ITable pTable = pFeatureWorkspace.OpenTable("TLOB.F03DES_DSCRG");
-            tabla.registrarUsuario(pTable,Convert.ToInt32(dataGridViewResultados.SelectedRows[0].Cells[2].Value));
-
-            lblProceso.Text = "Descarga Terminada";
-            btnDescargar.Enabled = true;
-        }
-
-        public void TestConnectivity_Using_Credentials()
-        {
             try
             {
-                NetworkCredential readCredentials = new System.Net.NetworkCredential(@"Domain\UserName", "Password");
-
-                string filepath = @"\\Servername\DevTest\MyFiles";
-                using (new NetworkConnection(filepath, readCredentials))
+                NetworkCredential writeCredentials = new NetworkCredential("usr-siger", "we3nya$i");
+                using (new NetworkConnection(@"\\172.25.1.204\siger\imagenes\", writeCredentials))
                 {
-                    //File.Copy(@"\\Servername\DevTest\MyFiles\XXX.txt\\Servername\DevTest\MyFiles\XXX-Copy.txt");
+
+                    System.IO.File.Copy(fileToCopy, Filename, true);
                 }
-                
             }
-            catch
+            catch (Exception ex)
             {
-                
+                MessageBox.Show("Error conectandose al servidor de imagenes" + ex.Message);
             }
+            try
+            {
+
+                IGPUtilities pGputilities = new GPUtilitiesClass();
+                Table_To_DataTable tabla = new Table_To_DataTable();
+                IWorkspace pWorkspace = WorkgroupArcSdeWorkspaceFromPropertySet();
+                IFeatureWorkspace pFeatureWorkspace = pWorkspace as IFeatureWorkspace;
+                ITable pTable = pFeatureWorkspace.OpenTable("TLOB.F03DES_DSCRG");
+                tabla.registrarUsuario(pTable, Convert.ToInt32(dataGridViewResultados.SelectedRows[0].Cells[2].Value));
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error actualizando base de datos" + ex.Message);
+            }
+            lblProceso.Text = "Descarga Terminada";
+            btnDescargar.Enabled = true;
+
         }
+
+        
 
         private void cbxTipo_SelectedIndexChanged(object sender, EventArgs e)
         {
@@ -446,75 +451,84 @@ namespace Teleobservacion
 
         private string ConsutaExtent( string xMax, string xMin, string yMin, string yMax, string tipo, string nombre, DateTimePicker fecha, string tipoRadar, string identificador, string path, string row)
         {
-            string consulta="";
-            if (nombre != "")
-            {
-                string cnombre = " AND IMG_NOMBRE =" + "'" + nombre + "'";
-                consulta = consulta + cnombre;
-            }          
-
-            if (fecha.Text != " ")
-            {
-
-                string cfecha = " AND IMG_FECHA ="+"TO_DATE('"+fecha.Value.ToString().Replace("/","-")+"','DD-MM-YYYY HH24:MI:SS')";
-                consulta = consulta + cfecha;
-            }
-
-            if (tipo != "")
-            {
-                string ctipo = " AND IMG_TIPO_IMGN =" + "'" + tipo + "'";
-                consulta = consulta +ctipo;
-            }
-            //[PST_TIPO_RADAR] = 1
-
-            if (tipoRadar != "")
-            {
-                string ctipoRadar;
-                if (tipoRadar == "Radarsat1")
+            
+                string consulta = "";
+              try
                 {
-                    ctipoRadar = " AND PST_TIPO_RADAR =" + "1";
-                }
-                else
+                if (nombre != "")
                 {
-                    ctipoRadar = " AND PST_TIPO_RADAR =" + "2";
+                    string cnombre = " AND IMG_NOMBRE =" + "'" + nombre + "'";
+                    consulta = consulta + cnombre;
                 }
 
-                consulta = consulta + ctipoRadar;
+                if (fecha.Text != " ")
+                {
+
+                    string cfecha = " AND IMG_FECHA =" + "TO_DATE('" + fecha.Value.ToString().Replace("/", "-") + "','DD-MM-YYYY HH24:MI:SS')";
+                    consulta = consulta + cfecha;
+                }
+
+                if (tipo != "")
+                {
+                    string ctipo = " AND IMG_TIPO_IMGN =" + "'" + tipo + "'";
+                    consulta = consulta + ctipo;
+                }
+                //[PST_TIPO_RADAR] = 1
+
+                if (tipoRadar != "")
+                {
+                    string ctipoRadar;
+                    if (tipoRadar == "Radarsat1")
+                    {
+                        ctipoRadar = " AND PST_TIPO_RADAR =" + "1";
+                    }
+                    else
+                    {
+                        ctipoRadar = " AND PST_TIPO_RADAR =" + "2";
+                    }
+
+                    consulta = consulta + ctipoRadar;
+                }
+                if (identificador != "")
+                {
+                    string cidentificador = " AND IMG_IDENT =" + "'" + identificador + "'";
+                    consulta = consulta + cidentificador;
+                }
+                if (path != "")
+                {
+                    string cpath = " AND IMG_PATH =" + "'" + path + "'";
+                    consulta = consulta + cpath;
+                }
+                if (row != "")
+                {
+                    string crow = " AND IMG_ROW =" + "'" + row + "'";
+                    consulta = consulta + crow;
+                }
+                string latitudMinima = "";
+                string latitudMaxima = "";
+                string longitudMinima = "";
+                string longitudMaxima = "";
+                //[IMG_ROW] = '329' AND [IMG_PATH] = '4'
+                if (yMin != "" && yMax != "" && xMin != "" && xMax != "")
+                {
+                    latitudMinima = "IMG_LAT_MIN >=" + yMin;
+                    latitudMaxima = "IMG_LAT_MAX <=" + yMax;
+                    longitudMinima = "IMG_LONG_MIN >=" + xMin;
+                    longitudMaxima = "IMG_LONG_MAX <=" + xMax;
+                    consulta = " AND " + latitudMinima + " AND " + latitudMaxima + " AND " + longitudMinima + " AND " + longitudMaxima + consulta;
+                }
+                if (consulta != "")
+                {
+                    consulta = consulta.Remove(0, 4);
+                }
+                //MessageBox.Show(consulta);
+                return consulta;
             }
-            if (identificador != "")
+            catch (Exception ex)
             {
-                string cidentificador = " AND IMG_IDENT =" + "'" + identificador + "'";
-                consulta = consulta + cidentificador;
+                MessageBox.Show("Error en la consulta" + ex.Message);
+                return consulta;
             }
-            if (path != "")
-            {
-                string cpath = " AND IMG_PATH =" + "'" + path + "'";
-                consulta = consulta + cpath;
-            }
-            if (row!= "")
-            {
-                string crow = " AND IMG_ROW =" + "'" + row + "'";
-                consulta = consulta + crow;
-            }
-            string latitudMinima = "";
-            string latitudMaxima = "";
-            string longitudMinima = "";
-            string longitudMaxima = "";
-            //[IMG_ROW] = '329' AND [IMG_PATH] = '4'
-            if (yMin != "" && yMax != "" && xMin != "" && xMax != "")
-            {
-                latitudMinima = "IMG_LAT_MIN >=" + yMin;
-                latitudMaxima = "IMG_LAT_MAX <=" + yMax;
-                longitudMinima = "IMG_LONG_MIN >=" + xMin;
-                longitudMaxima = "IMG_LONG_MAX <=" + xMax;
-                consulta = " AND " + latitudMinima + " AND " + latitudMaxima + " AND " + longitudMinima + " AND " + longitudMaxima + consulta;
-            }
-            if (consulta!="")
-            {
-                consulta = consulta.Remove(0,4);
-            }
-            //MessageBox.Show(consulta);
-            return consulta;
 
         }
 
@@ -545,12 +559,22 @@ namespace Teleobservacion
             propertySet.SetProperty("PASSWORD", "TeleobservacionSGC");
             propertySet.SetProperty("VERSION", "SDE.DEFAULT");
             propertySet.SetProperty("AUTHENTICATION_MODE", "DBMS");
+            try
+            {
 
-            Type factoryType = Type.GetTypeFromProgID(
-                "esriDataSourcesGDB.SdeWorkspaceFactory");
-            IWorkspaceFactory workspaceFactory = (IWorkspaceFactory)Activator.CreateInstance
-                (factoryType);
-            return workspaceFactory.Open(propertySet, 0);
+                Type factoryType = Type.GetTypeFromProgID(
+                    "esriDataSourcesGDB.SdeWorkspaceFactory");
+                IWorkspaceFactory workspaceFactory = (IWorkspaceFactory)Activator.CreateInstance
+                    (factoryType);
+                return workspaceFactory.Open(propertySet, 0);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error conectandose a la base de Datos" + ex.Message);
+                return null;
+            }
+
+            
         }
             
             
